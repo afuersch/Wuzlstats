@@ -26,13 +26,10 @@ namespace Wuzlstats.ViewModels.Hubs
 
         private async Task SavePlayerScore(League league, Db db)
         {
-            if (BluePlayerScore <= 0 && RedPlayerScore <= 0)
+            ValidateScore(BluePlayerScore, RedPlayerScore);
+            if (BluePlayer.IsNullOrWhiteSpace() || RedPlayer.IsNullOrWhiteSpace())
             {
-                throw new Exception("Invalid scores, both must be greater zero.");
-            }
-            if (BluePlayer.IsNullOrEmpty() || RedPlayer.IsNullOrEmpty())
-            {
-                throw new Exception("One or more player names empty.");
+                throw new Exception("One or more player names are empty.");
             }
 
             var bluePlayer = await GetOrCreatePlayer(BluePlayer, league, db);
@@ -46,13 +43,10 @@ namespace Wuzlstats.ViewModels.Hubs
 
         private async Task SaveTeamScore(League league, Db db)
         {
-            if (BlueTeamScore <= 0 && RedTeamScore <= 0)
+            ValidateScore(BlueTeamScore, RedTeamScore);
+            if (BlueTeamOffense.IsNullOrWhiteSpace() || BlueTeamDefense.IsNullOrWhiteSpace() || RedTeamOffense.IsNullOrWhiteSpace() || RedTeamDefense.IsNullOrWhiteSpace())
             {
-                throw new Exception("Invalid scores, both must be greater zero.");
-            }
-            if (BlueTeamOffense.IsNullOrEmpty() || BlueTeamDefense.IsNullOrEmpty() || RedTeamOffense.IsNullOrEmpty() || RedTeamDefense.IsNullOrEmpty())
-            {
-                throw new Exception("One or more player names empty.");
+                throw new Exception("One or more player names are empty.");
             }
 
             var blueOffense = await GetOrCreatePlayer(BlueTeamOffense, league, db);
@@ -68,20 +62,40 @@ namespace Wuzlstats.ViewModels.Hubs
         }
 
 
+        /// <summary>
+        /// A score must be greater than or equal to zero. Both scores can't be zero.
+        /// </summary>
+        private static void ValidateScore(int blueScore, int redScore)
+        {
+            //both scores must not be negative
+            if (blueScore < 0 || redScore < 0)
+            {
+                throw new ArgumentException("Invalid score, a score must be greater than or equal to zero.");
+            }
+            //Both scores can't be zero
+            if (blueScore <= 0 && redScore <= 0)
+            {
+                throw new ArgumentException("Invalid scores, both can't be zero.");
+            }
+        }
+
+
         private async Task<Models.Player> GetOrCreatePlayer(string name, League league, Db db)
         {
+            name = name.Trim();
             var playerQuery = db.Players.Where(x => x.LeagueId == league.Id);
-            var player = await playerQuery.FirstOrDefaultAsync(x => x.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
-            if (player == null)
+            var player = await playerQuery.FirstOrDefaultAsync(x => x.Name.ToLower() == name.ToLower());
+            if (player != null)
             {
-                player = new Models.Player
-                {
-                    LeagueId = league.Id,
-                    Name = name
-                };
-                db.Players.Add(player);
-                await db.SaveChangesAsync();
+                return player;
             }
+            player = new Models.Player
+            {
+                LeagueId = league.Id,
+                Name = name
+            };
+            db.Players.Add(player);
+            await db.SaveChangesAsync();
             return player;
         }
 
