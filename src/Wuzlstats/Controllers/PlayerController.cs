@@ -2,12 +2,13 @@
 using System.IO;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
-using ImageSharp;
+using SixLabors.ImageSharp;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Wuzlstats.Models;
 using Wuzlstats.ViewModels.Player;
-using ImageSharp.Formats;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Png;
 
 namespace Wuzlstats.Controllers
 {
@@ -51,7 +52,8 @@ namespace Wuzlstats.Controllers
                 var outputStream = new MemoryStream();
                 using (var image = Image.Load(avatar.OpenReadStream()))
                 {
-                    image.Resize(150, 150).Save(outputStream, new PngFormat());
+                    image.Mutate(x => x.Resize(150, 150));
+                    image.SaveAsPng(outputStream);
                 }
                 player.Image = outputStream.ToArray();
                 await _db.SaveChangesAsync();
