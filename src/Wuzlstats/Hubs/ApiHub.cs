@@ -22,7 +22,7 @@ namespace Wuzlstats.Hubs
 
         public async Task JoinLeague(string league)
         {
-            await Groups.Add(Context.ConnectionId, league);
+            await Groups.AddToGroupAsync(Context.ConnectionId, league);
             await NotifyCallerToReloadPlayers(league);
             await NotifyCallerToReloadStatistics(league);
         }
@@ -30,7 +30,7 @@ namespace Wuzlstats.Hubs
 
         public Task LeaveLeague(string league)
         {
-            return Groups.Remove(Context.ConnectionId, league);
+            return Groups.RemoveFromGroupAsync(Context.ConnectionId, league);
         }
 
 
