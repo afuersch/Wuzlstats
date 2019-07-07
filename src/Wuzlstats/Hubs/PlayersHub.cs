@@ -7,13 +7,13 @@ namespace Wuzlstats.Hubs
     {
         public async Task NotifyCallerToReloadPlayers(string league)
         {
-            Clients.Caller.reloadPlayers(await new ReloadPlayersViewModel(_db).Fill(league));
+            await Clients.Caller.SendCoreAsync("reloadPlayers", new[] { await new ReloadPlayersViewModel(_db).Fill(league) });
         }
 
 
         public async Task NotifyGroupToReloadPlayers(string league)
         {
-            Clients.Group(league).reloadPlayers(await new ReloadPlayersViewModel(_db).Fill(league));
+            await Clients.Group(league).SendCoreAsync("reloadPlayers", new[] { await new ReloadPlayersViewModel(_db).Fill(league) });
         }
     }
 }

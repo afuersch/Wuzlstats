@@ -9,14 +9,14 @@ namespace Wuzlstats.Hubs
         public async Task NotifyCallerToReloadStatistics(string league)
         {
             var viewModel = await _services.GetRequiredService<LeagueStatisticsViewModel>().Fill(await CheckAndLoadLeague(league));
-            await Clients.Caller.reloadStatistics(viewModel);
+            await Clients.Caller.SendCoreAsync("reloadStatistics", new[] { viewModel });
         }
 
 
         public async Task NotifyGroupToReloadStatistics(string league)
         {
             var viewModel = await _services.GetRequiredService<LeagueStatisticsViewModel>().Fill(await CheckAndLoadLeague(league));
-            Clients.Group(league).reloadStatistics(viewModel);
+            await Clients.Group(league).SendCoreAsync("reloadStatistics", new[] { viewModel });
         }
     }
 }
