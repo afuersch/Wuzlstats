@@ -39,7 +39,7 @@ namespace Wuzlstats
 
             services.AddDbContext<Db>(options => { options.UseSqlServer(settings.DatabaseConnectionString); });
 
-            services.AddSignalR(/*options => { options.Hubs.EnableDetailedErrors = true; }*/);
+            services.AddSignalR(options => { options.EnableDetailedErrors = true; });
             services.AddMvc().AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
         }
 
@@ -67,7 +67,7 @@ namespace Wuzlstats
             app.UseWebSockets();
             app.UseSignalR(routes =>
             {
-                routes.MapHub<ApiHub>("apiHub");
+                routes.MapHub<ApiHub>("/apiHub");
             });
             app.UseMvc(routes => { routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"); });
         }
