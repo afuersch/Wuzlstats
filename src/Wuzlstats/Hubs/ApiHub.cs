@@ -2,13 +2,11 @@
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.AspNetCore.SignalR.Hubs;
 using Wuzlstats.Extensions;
 using Wuzlstats.Models;
 
 namespace Wuzlstats.Hubs
 {
-    [HubName("apiHub")]
     public partial class ApiHub : Hub
     {
         private readonly Db _db;

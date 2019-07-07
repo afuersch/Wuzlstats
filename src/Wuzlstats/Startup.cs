@@ -8,6 +8,7 @@ using Newtonsoft.Json.Serialization;
 using Wuzlstats.Models;
 using Wuzlstats.ViewModels.Home;
 using Wuzlstats.ViewModels.Hubs;
+using Wuzlstats.Hubs;
 
 namespace Wuzlstats
 {
@@ -38,7 +39,7 @@ namespace Wuzlstats
 
             services.AddDbContext<Db>(options => { options.UseSqlServer(settings.DatabaseConnectionString); });
 
-            services.AddSignalR(options => { options.Hubs.EnableDetailedErrors = true; });
+            services.AddSignalR(/*options => { options.Hubs.EnableDetailedErrors = true; }*/);
             services.AddMvc().AddJsonOptions(options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
         }
 
@@ -64,7 +65,10 @@ namespace Wuzlstats
 
             app.UseStaticFiles();
             app.UseWebSockets();
-            app.UseSignalR();
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ApiHub>("apiHub");
+            });
             app.UseMvc(routes => { routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}"); });
         }
     }
